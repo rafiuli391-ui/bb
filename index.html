@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Rajshahi Iftar Mosjid Finder</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Pacifico&display=swap"
+        rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet (keep) -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+
+    <!-- Bootstrap + Template CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- ✅ Leaflet (Map) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* ✅ Only for our new sections */
+        #map {
+            height: 520px;
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, .08);
+        }
+
+        .mosque-card {
+            border: 1px solid rgba(0, 0, 0, .08);
+            border-radius: 12px;
+            padding: 14px;
+            background: #fff;
+            transition: .2s;
+        }
+
+        .mosque-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .06);
+        }
+
+        .review-item {
+            border: 1px solid rgba(0, 0, 0, .08);
+            border-radius: 12px;
+            padding: 12px;
+            background: #fff;
+        }
+
+        .star-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 0, 0, .12);
+            cursor: pointer;
+            user-select: none;
+            background: #fff;
+            margin-right: 8px;
+        }
+
+        .star-btn.active {
+            border-color: #0d6efd;
+            background: rgba(13, 110, 253, .08);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show w-100 vh-100 bg-white position-fixed translate-middle top-50 start-50  d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" role="status"></div>
+    </div>
+    <!-- Spinner End -->
+
+
+    <!-- Topbar start (keep) -->
+    <div class="container-fluid fixed-top">
+        <div class="container topbar d-none d-lg-block">
+            <div class="topbar-inner">
+                <div class="row gx-0">
+                    <div class="col-lg-7 text-start">
+                        <div class="h-100 d-inline-flex align-items-center me-4">
+                            <span class="fa fa-phone-alt me-2 text-dark"></span>
+                            <a href="#" class="text-secondary"><span>+880 1XXXXXXXXX</span></a>
+                        </div>
+                        <div class="h-100 d-inline-flex align-items-center">
+                            <span class="far fa-envelope me-2 text-dark"></span>
+                            <a href="#" class="text-secondary"><span>info@yourdomain.com</span></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 text-end">
+                        <div class="h-100 d-inline-flex align-items-center">
+                            <span class="text-body">Follow Us:</span>
+                            <a class="text-dark px-2" href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a class="text-dark px-2" href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navbar (keep but simplify menu) -->
+        <div class="container">
+            <nav class="navbar navbar-light navbar-expand-lg py-3">
+                <a href="index.html" class="navbar-brand">
+                    <h1 class="mb-0">Iftar<span class="text-primary">Finder</span></h1>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                    <span class="fa fa-bars text-primary"></span>
+                </button>
+
+                <div class="collapse navbar-collapse bg-white" id="navbarCollapse">
+                    <div class="navbar-nav ms-lg-auto mx-xl-auto">
+                        <a href="#finder" class="nav-item nav-link active">Mosjid Finder</a>
+                        <a href="#reviews" class="nav-item nav-link">Reviews</a>
+                        <a href="#mapSec" class="nav-item nav-link">Map</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+
+    <!-- Hero Start (keep your vibe) -->
+    <div class="container-fluid hero-header">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="hero-header-inner animated zoomIn">
+                        <p class="fs-4 text-dark">RAJSHAHI • RAMADAN</p>
+                        <h1 class="display-2 mb-4 text-dark">Free Iftar Mosjid Finder</h1>
+                        <a href="#finder" class="btn btn-primary py-3 px-5">Find Mosjid</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Hero End -->
+
+
+    <!-- ✅ Mosque Finder + Map + Search -->
+    <div id="finder" class="container-fluid py-5">
+        <div class="container py-4">
+            <div class="row g-4 align-items-stretch">
+
+                <!-- Left: Search + List -->
+                <div class="col-lg-5">
+                    <div class="bg-light p-4 rounded">
+                        <h2 class="mb-3">Mosjid List</h2>
+                        <p class="text-muted mb-4">Search করে mosjid select করলে map এ location দেখাবে।</p>
+
+                        <div class="mb-3">
+                            <input id="q" class="form-control" placeholder="Search: mosjid / area / address">
+                        </div>
+
+                        <div class="mb-3">
+                            <select id="thana" class="form-select">
+                                <option value="">All Thana</option>
+                            </select>
+                        </div>
+
+                        <div id="list" class="d-grid gap-3"></div>
+                        <div id="empty" class="text-muted mt-3" style="display:none;">Kono result paoa jayni.</div>
+                    </div>
+                </div>
+
+                <!-- Right: Map -->
+                <div id="mapSec" class="col-lg-7">
+                    <div class="bg-light p-4 rounded h-100">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h2 class="mb-0">Map</h2>
+
+                            </div>
+                            <button id="focusRaj" class="btn btn-outline-primary btn-sm">Focus Rajshahi</button>
+                        </div>
+
+                        <div class="mt-3" id="map"></div>
+
+                        <div class="mt-3">
+                            <div class="alert alert-warning mb-0">
+                                <b>Note:</b> Public mosjid add করা যাবে না। (Only admin will update list)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ✅ Reviews Section (public can submit) -->
+    <div id="reviews" class="container-fluid py-5 bg-light">
+        <div class="container py-4">
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <h2 class="mb-3">Submit a Review</h2>
+
+
+                    <div class="bg-white p-4 rounded">
+                        <div class="mb-3">
+                            <label class="form-label">Select Mosjid</label>
+                            <select id="reviewMosque" class="form-select"></select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label><br>
+                            <div id="stars"></div>
+                            <small class="text-muted">1-5 star select করো</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Your Review</label>
+                            <textarea id="reviewText" class="form-control" rows="4"
+                                placeholder="Short review লিখো..."></textarea>
+                        </div>
+
+                        <button id="submitReview" class="btn btn-primary">Submit Review</button>
+                        <button id="clearReviews" class="btn btn-outline-danger ms-2">Clear (this device)</button>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <h2 class="mb-3">Recent Reviews</h2>
+                    <div id="reviewList" class="d-grid gap-3"></div>
+                    <div id="noReviews" class="text-muted">No reviews yet.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ✅ Simple Footer (light) -->
+    <div class="container-fluid bg-dark text-light py-4">
+        <div class="container d-flex justify-content-between flex-wrap gap-2">
+            <div>© <span id="year"></span> • Rajshahi Iftar Finder</div>
+            <div class="text-secondary">Made for Ramadan community help</div>
+        </div>
+    </div>
+
+
+    <!-- Scripts (keep) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // =========================
+        // 1) Mosque Data (Admin updates only)
+        // Replace these with real Rajshahi mosques + lat/lng
+        // =========================
+        const MOSQUES = [
+            { id: 1, name: "Shaheb Bazar Jame Mosjid", thana: "Boalia", area: "Shaheb Bazar", address: "Shaheb Bazar, Rajshahi", lat: 24.3682, lng: 88.6004 },
+            { id: 2, name: "Upashahar Jame Mosjid", thana: "Motihar", area: "Upashahar", address: "Upashahar, Rajshahi", lat: 24.3816, lng: 88.6123 },
+            { id: 3, name: "Kazla Mosjid", thana: "Motihar", area: "Kazla", address: "Kazla, Rajshahi", lat: 24.3709, lng: 88.6345 },
+            { id: 4, name: "Laxmipur Mosjid", thana: "Rajpara", area: "Laxmipur", address: "Laxmipur, Rajshahi", lat: 24.3609, lng: 88.6049 },
+        ];
+
+        // =========================
+        // 2) Helpers
+        // =========================
+        const el = (id) => document.getElementById(id);
+        function escapeHtml(s) {
+            return String(s ?? "")
+                .replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;").replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+        function uniqueSorted(arr) { return [...new Set(arr.filter(Boolean))].sort((a, b) => a.localeCompare(b)); }
+
+        // =========================
+        // 3) Map init
+        // =========================
+        const rajCenter = [24.3745, 88.6042];
+        const map = L.map("map").setView(rajCenter, 13);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "&copy; OpenStreetMap" }).addTo(map);
+        let layer = L.layerGroup().addTo(map);
+
+        function renderMarkers(items) {
+            layer.clearLayers();
+            items.forEach(m => {
+                const mk = L.marker([m.lat, m.lng]).addTo(layer);
+                mk.bindPopup(`<b>${escapeHtml(m.name)}</b><br>${escapeHtml(m.address)}<br><small>${escapeHtml(m.area || "")} • ${escapeHtml(m.thana || "")}</small>`);
+                mk.on("click", () => focusMosque(m.id));
+            });
+        }
+
+        function focusMosque(id) {
+            const m = MOSQUES.find(x => x.id === id);
+            if (!m) return;
+            map.setView([m.lat, m.lng], 16, { animate: true });
+            layer.eachLayer(l => {
+                const ll = l.getLatLng();
+                if (ll.lat === m.lat && ll.lng === m.lng) l.openPopup();
+            });
+        }
+
+        // =========================
+        // 4) Search + list
+        // =========================
+        const state = { q: "", thana: "" };
+
+        function filtered() {
+            let items = [...MOSQUES];
+            const q = state.q.trim().toLowerCase();
+            if (state.thana) items = items.filter(m => (m.thana || "") === state.thana);
+            if (q) {
+                items = items.filter(m => {
+                    const t = `${m.name} ${m.area || ""} ${m.thana || ""} ${m.address || ""}`.toLowerCase();
+                    return t.includes(q);
+                });
+            }
+            return items;
+        }
+
+        function render() {
+            const items = filtered();
+
+            // thana dropdown
+            const thanas = uniqueSorted(MOSQUES.map(m => m.thana));
+            el("thana").innerHTML = `<option value="">All Thana</option>` + thanas.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+            el("thana").value = state.thana;
+
+            // list
+            const list = el("list");
+            list.innerHTML = "";
+            el("empty").style.display = items.length ? "none" : "block";
+
+            items.forEach(m => {
+                const div = document.createElement("div");
+                div.className = "mosque-card";
+                div.innerHTML = `
+          <h5 class="mb-1">${escapeHtml(m.name)}</h5>
+          <div class="text-muted">${escapeHtml(m.area || "")} • ${escapeHtml(m.thana || "")}</div>
+          <div class="text-muted">${escapeHtml(m.address)}</div>
+          <div class="d-flex gap-2 flex-wrap mt-3">
+            <button class="btn btn-sm btn-primary" data-go="${m.id}">Show on map</button>
+            <a class="btn btn-sm btn-outline-secondary" target="_blank" rel="noopener"
+               href="https://www.google.com/maps?q=${m.lat},${m.lng}">Google Map</a>
+          </div>
+        `;
+                list.appendChild(div);
+            });
+
+            list.querySelectorAll("button[data-go]").forEach(btn => {
+                btn.addEventListener("click", () => focusMosque(Number(btn.getAttribute("data-go"))));
+            });
+
+            // update markers
+            renderMarkers(items);
+
+            // update reviews dropdown too
+            renderReviewMosqueDropdown();
+        }
+
+        el("q").addEventListener("input", e => { state.q = e.target.value; render(); });
+        el("thana").addEventListener("change", e => { state.thana = e.target.value; render(); });
+        el("focusRaj").addEventListener("click", () => map.setView(rajCenter, 13, { animate: true }));
+
+        // =========================
+        // 5) Reviews (public submit) - LocalStorage demo
+        // =========================
+        const LS_REV = "rajsahi_mosque_reviews_v1";
+        let currentStars = 0;
+
+        function loadReviews() {
+            try { return JSON.parse(localStorage.getItem(LS_REV) || "[]"); } catch { return []; }
+        }
+        function saveReviews(arr) { localStorage.setItem(LS_REV, JSON.stringify(arr)); }
+        function addReview(mosqueId, stars, text) {
+            const arr = loadReviews();
+            const m = MOSQUES.find(x => x.id === mosqueId);
+            arr.unshift({
+                id: Date.now(),
+                mosqueId,
+                mosqueName: m ? m.name : "Unknown",
+                stars,
+                text,
+                createdAt: new Date().toISOString()
+            });
+            saveReviews(arr);
+        }
+
+        function renderReviewMosqueDropdown() {
+            const sel = el("reviewMosque");
+            const val = sel.value;
+            sel.innerHTML = MOSQUES.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join("");
+            if (val) sel.value = val;
+        }
+
+        function renderReviews() {
+            const arr = loadReviews();
+            const box = el("reviewList");
+            box.innerHTML = "";
+            el("noReviews").style.display = arr.length ? "none" : "block";
+
+            arr.slice(0, 12).forEach(r => {
+                const div = document.createElement("div");
+                div.className = "review-item";
+                div.innerHTML = `
+          <b>${escapeHtml(r.mosqueName)}</b>
+          <div class="text-primary">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</div>
+          <div class="mt-2">${escapeHtml(r.text)}</div>
+          <small class="text-muted">${new Date(r.createdAt).toLocaleString()}</small>
+        `;
+                box.appendChild(div);
+            });
+        }
+
+        function buildStars() {
+            const box = el("stars");
+            box.innerHTML = "";
+            for (let i = 1; i <= 5; i++) {
+                const b = document.createElement("span");
+                b.className = "star-btn";
+                b.textContent = "★";
+                b.addEventListener("click", () => {
+                    currentStars = i;
+                    [...box.children].forEach((x, idx) => x.classList.toggle("active", idx < i));
+                });
+                box.appendChild(b);
+            }
+        }
+
+        el("submitReview").addEventListener("click", () => {
+            const mosqueId = Number(el("reviewMosque").value);
+            const text = el("reviewText").value.trim();
+            if (currentStars < 1) return alert("Please select star rating (1-5).");
+            if (text.length < 2) return alert("Please write a short review.");
+            addReview(mosqueId, currentStars, text);
+            el("reviewText").value = "";
+            currentStars = 0;
+            [...el("stars").children].forEach(x => x.classList.remove("active"));
+            renderReviews();
+            alert("Thanks! Review saved (this device).");
+        });
+
+        el("clearReviews").addEventListener("click", () => {
+            if (!confirm("Clear all reviews from this device?")) return;
+            localStorage.removeItem(LS_REV);
+            renderReviews();
+        });
+
+        // =========================
+        // Init
+        // =========================
+        buildStars();
+        render();
+        renderReviews();
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+
+</body>
+
+</html>
